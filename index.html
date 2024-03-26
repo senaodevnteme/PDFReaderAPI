@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PDF Upload</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('https://wallpaperaccess.com/full/1851036.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            /* Adicionado para centralizar o conteúdo */
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group select {
+            background-color: rgba(255, 255, 255, 0.5); /* Adicionado */
+            width: calc(100% - 10px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-group label {
+            opacity: 1; /* Adicionado para tornar o texto mais transparente */
+        }
+
+        .form-field {
+            width: calc(100% - 10px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .signature-message {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 40%;
+            /* Agora a logo terá no máximo 100% da largura da caixa */
+            height: auto;
+            /* Isso garante que a proporção da logo seja mantida */
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            border: 1px solid #ccc;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        input[type="file"] {
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <img src="https://fluig.am-workflow.nttltd.global.ntt/volume/stream/Rmx1aWc=/P3Q9MSZ2b2w9RGVmYXVsdCZpZD04JnZlcj0yMDAwJmZpbGU9bG9nb190ZWxhTG9naW4ucG5nJmNyYz0yMzQ2MTk1MzY1JnNpemU9MC4wMjMwNTUmdUlkPTE4NDAzJmZTSWQ9NTIxMiZ1U0lkPTUyMTImZD1mYWxzZSZ0a249JnB1YmxpY1VybD1mYWxzZQ==.png"
+            alt="Logo" class="logo">
+        <hr class="divider">
+        <form id="uploadForm" action="http://localhost:7071/api/MyFunction" method="post" role="form" autocomplete="off"
+            enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="manufacturer">Manufacturer</label>
+                <select class="form-field" name="manufacturer" id="manufacturer">
+                    <option value="">Selecione</option>
+                    <option value="Dell">Dell</option>
+                    <option value="Infoblox">Infoblox</option>
+                    <option value="F5 - 1">F5 - 1</option>
+                    <option value="F5 - 2">F5 - 2</option>
+                    <option value="Palo Alto - Ingram">Palo Alto - Ingram</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pdfFile">Selecione o arquivo PDF:</label><br>
+                <input type="file" class="form-field" id="pdfFile" name="pdf_file" accept=".pdf" multiple>
+            </div>
+
+            <div class="form-group">
+                <input id="uploadButton" class="button" type="submit" value="Upload" />
+            </div>
+        </form>
+
+        <p class="signature-message">All rights reserved <b>2023</b></p>
+    </div>
+
+    <script type="text/javascript">
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'http://localhost:7071/api/MyFunction', true);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var contentType = xhr.getResponseHeader('content-type');
+                    var contentDisposition = xhr.getResponseHeader('content-disposition');
+                    var matches = /filename[^;=\n]=((['"]).?\2|[^;\n]*)/.exec(contentDisposition);
+                    var filename = matches != null && matches[1] ? matches[1].replace(/['"]/g, '') : 'result.xlsx';
+
+                    var blob = new Blob([xhr.response], { type: contentType });
+
+                    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                        window.navigator.msSaveBlob(blob, filename);
+                    } else {
+                        var downloadLink = window.document.createElement('a');
+                        downloadLink.href = window.URL.createObjectURL(blob);
+                        downloadLink.download = filename;
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+                    }
+                }
+            };
+
+            xhr.send(formData);
+        });
+    </script>
+</body>
+
+</html>
